@@ -183,7 +183,7 @@ function updateProject(projectData) {
         if (xhr.status === 200) {
             console.log('Project updated successfully:', xhr.responseText);
             fetchProjects(); // Refresh projects list after update
-            displayManageProjects(); // Display manage projects view
+            displayManageProjects();
         } else {
             console.error('Error updating project:', xhr.statusText);
         }
@@ -210,6 +210,7 @@ function updateProject(projectData) {
             };
             updateProject(projectData);
             fetchProjects();
+            displayManageProjects();
         });
     }
 

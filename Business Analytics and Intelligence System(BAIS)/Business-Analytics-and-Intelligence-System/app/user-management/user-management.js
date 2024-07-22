@@ -34,6 +34,34 @@ document.addEventListener('DOMContentLoaded', function() {
     // Call the function to fetch roles and populate dropdown on page load
     fetchRolesAndPopulateDropdown();
 
+    function fetchRolesAndPopulateUpdateDropdown() {
+        var xhr = new XMLHttpRequest();
+        xhr.open('GET', 'http://localhost:8080/roles/all'); // Replace with your actual API endpoint to fetch roles
+        xhr.onload = function() {
+            if (xhr.status === 200) {
+                var data = JSON.parse(xhr.responseText);
+                var selectDropdown = document.getElementById('updaterole');
+                selectDropdown.innerHTML = ''; // Clear existing options
+
+                // Populate options with fetched roles
+                data.forEach(function(role) {
+                    var option = document.createElement('option');
+                    option.value = role.roleId;
+                    option.textContent = role.roleName;
+                    selectDropdown.appendChild(option);
+                });
+            } else {
+                console.error('Error fetching roles:', xhr.statusText);
+                // Handle error as needed
+            }
+        };
+        xhr.onerror = function() {
+            console.error('Request failed');
+            // Handle network errors
+        };
+        xhr.send();
+    }
+
     // Function to fetch users from API and display in the table
     function fetchUsers() {
         var xhr = new XMLHttpRequest();
@@ -60,7 +88,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // Populate table with fetched users
         users.forEach(function(user) {
-            var userId = user.id; // Store user id in a variable
+            var userId = user.userId; // Store user id in a variable
 
             var row = '<tr data-user-id="' + userId + '">' +
               '<td>' + user.username + '</td>' + 
@@ -208,7 +236,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Function to update user details through API
     function updateUser(userData) {
         var xhr = new XMLHttpRequest();
-        xhr.open('PUT', 'http://localhost:8080/users/update/' + userData.id); // Replace with your actual API endpoint to update user
+        xhr.open('PUT', 'http://localhost:8080/users/update/' + userData.userId); // Replace with your actual API endpoint to update user
         xhr.setRequestHeader('Content-Type', 'application/json');
         xhr.onload = function() {
             if (xhr.status === 200) {
@@ -230,11 +258,11 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Event listener for update form submission
     document.getElementById('UpdateUserForm').addEventListener('submit', function(event) {
+        console.log('event',event);
         event.preventDefault();
-        
         var formData = new FormData(this);
         var userData = {
-            id: formData.get('updateuserid'),
+            userId: formData.get('updateuserid'),
             username: formData.get('updateusername'),
             email: formData.get('updateEmail'),
             phone: formData.get('updatePhone'),
@@ -243,33 +271,37 @@ document.addEventListener('DOMContentLoaded', function() {
             },
             address: formData.get('updateAddress')
         };
-
+        console.log('userData',userData);
         updateUser(userData); // Update user details through API
     });
 
-    // Function to open update form/modal with user details
-    function openUpdateForm(userId) {
-        fetchUserDetails(userId, function(user) {
-            // Populate update form with user details
-            document.getElementById('updateuserid').value = user.id;
-            document.getElementById('updateusername').value = user.username;
-            document.getElementById('updateEmail').value = user.email;
-            document.getElementById('updatePhone').value = user.phone;
-            document.getElementById('updateRole').value = user.role.roleId; // Assuming role ID is correct
-            document.getElementById('updateAddress').value = user.address;
+// Function to open update form/modal with user details
+function openUpdateForm(userId) {
+    fetchUserDetails(userId, function(user) {
+        console.log('user',user);
+        // Populate update form with user details
+        document.getElementById('updateuserid').value = user.userId;
+        document.getElementById('updateusername').value = user.username;
+        document.getElementById('updateEmail').value = user.email;
+        document.getElementById('updatePhone').value = user.phone;
+        document.getElementById('updateAddress').value = user.address;
 
-            // Show the update user modal (assuming you have a Bootstrap modal)
-            var updateModal = new bootstrap.Modal(document.getElementById('UpdateUserModal'));
-            updateModal.show();
-        });
-    }
+        // Populate roles dropdown for update form
+        fetchRolesAndPopulateUpdateDropdown(); // Call function to fetch roles and populate dropdown
+
+        // Show the update user modal (assuming you have a Bootstrap modal)
+        var updateModal = new bootstrap.Modal(document.getElementById('UpdateUserModal'));
+        updateModal.show();
+    });
+}
+
 
     // Function to delete user
     function deleteUser(userId) {
         var xhr = new XMLHttpRequest();
         xhr.open('DELETE', 'http://localhost:8080/users/delete/' + userId); // Replace with your actual API endpoint
         xhr.onload = function() {
-            if (xhr.status === 200) {
+            if (xhr.status === 204) {
                 console.log('User deleted successfully.');
                 alert("user deleted successfully");
                 removeUserRow(userId);
