@@ -34,8 +34,8 @@ function displayPurchaseOrders(pageNumber = 1, pageSize = 10) {
                             <td>${order.supplier}</td>
                             <td>${order.price}</td>
                             <td>
-                                <button type="button" class="btn btn-primary btn-sm btn-update" data-order-id="${order.id}">Update</button>
-                                <button type="button" class="btn btn-danger btn-sm btn-delete" data-order-id="${order.id}">Delete</button>
+                                <button type="button" class="btn btn-primary btn-sm btn-update" data-order-id="${order.id} id="btn-update">Update</button>
+                                <button type="button" class="btn btn-danger btn-sm btn-delete" data-order-id="${order.id}" id="btn-delete">Delete</button>
                             </td>
                         </tr>`;
     });
@@ -46,7 +46,7 @@ function displayPurchaseOrders(pageNumber = 1, pageSize = 10) {
 document.querySelectorAll('.btn-update').forEach(button => {
     button.addEventListener('click', function() {
         const orderId = parseInt(button.dataset.orderId, 10);
-        updatePurchaseOrder(orderId); // Call your update modal function here
+        openUpdateForm(orderId); 
     });
 });
 
@@ -216,6 +216,33 @@ function fetchSuppliersAndPopulateSelect() {
         });
 }
 
+// Function to fetch suppliers from API and populate the select element
+function fetchUpdateSuppliersAndPopulateSelect() {
+    fetch('http://localhost:8080/getAllSuppliers')
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Failed to fetch suppliers');
+            }
+            return response.json();
+        })
+        .then(suppliers => {
+            // Populate the select element with fetched suppliers
+            const selectElement = document.getElementById('updateSupplier');
+            selectElement.innerHTML = ''; // Clear existing options
+
+            suppliers.forEach(supplier => {
+                const option = document.createElement('option');
+                option.value = supplier.name; // Assuming supplier name is used as value
+                option.textContent = supplier.name;
+                selectElement.appendChild(option);
+            });
+        })
+        .catch(error => {
+            console.error('Error fetching suppliers:', error);
+            // Optionally handle or display the error
+        });
+}
+
 // Initial fetch and populate table
 document.addEventListener('DOMContentLoaded', function () {
     fetchPurchaseOrders();
@@ -239,6 +266,7 @@ function openUpdateForm(orderId) {
             document.getElementById('updatePrice').value = order.price;
             // Show the update modal
             $('#updateOrderModal').modal('show');
+            fetchUpdateSuppliersAndPopulateSelect();
         })
         .catch(error => {
             console.error('Error fetching order details:', error);
@@ -303,14 +331,12 @@ async function updatePurchaseOrder(orderId, updatedOrder) {
             console.error('Updated order not found in the local data.');
         }
 
-        // Update table display
-        displayPurchaseOrders();
-
         // Close update modal (if using a modal)
         $('#updateOrderModal').modal('hide');
-
         // Show success message using Bootstrap modal or toast
         alert('Purchase order updated successfully');
+        // Update table display
+        fetchPurchaseOrders();
 
     } catch (error) {
         console.error('Error updating purchase order:', error);
