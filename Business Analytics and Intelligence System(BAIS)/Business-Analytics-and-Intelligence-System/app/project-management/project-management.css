@@ -1,0 +1,46 @@
+
+main {
+    margin-left: 285px;
+    margin-top: 1.5em;
+    margin-right: 1.2em;
+}
+.hidden {
+  display: none;
+}
+.visible {
+  display: block;
+}
+#DisplayProjectsList {
+    width: 100%; /* Adjust the width as per your design needs */
+    margin: 0 auto; /* Center align the table */
+  }
+  #searchInput {
+    width: 200px; /* Adjust the width as per your design needs */
+  }
+  #updateProject {
+    background-color: grey;
+    border-color: grey;
+  }
+  #submitProject {
+    background-color: grey;
+    border-color: grey;
+  }
+  #submitProject:hover {
+    color: black;
+  }
+#ManageProjectsTableData .btn-update {
+  background-color:grey; /* Bootstrap primary color */
+  border-color: grey;
+  color: #fff; /* Text color */
+}
+
+#ManageProjectsTableData .btn-delete {
+  background-color: #dc3545; /* Bootstrap danger color */
+  color: #fff; /* Text color */
+}
+#ManageProjectsTableData .btn-update:hover {
+  color: black;
+}
+#ManageProjectsTableData .btn-delete:hover {
+  color: black;
+}

@@ -1,0 +1,46 @@
+@font-face {
+    font-family: 'PT Sans';
+    src: url('../../resources/fonts/PTSans-Regular.ttf') format('truetype');
+    font-weight: 400;
+    font-style: normal;
+}
+body {
+    padding-top: 1em; /* Adjust based on navbar height */
+    font-family: "PT Sans", sans-serif;
+}
+
+.main-content {
+    margin-left: 270px; /* Adjust based on sidebar width */
+    padding: 20px;
+}
+.document-item {
+    margin-bottom: 20px;
+    padding: 15px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    background-color: #fff;
+}
+
+.document-item h5 {
+    margin-top: 0;
+    font-size: 1.25rem;
+}
+
+.document-item p {
+    margin-bottom: 10px;
+}
+
+.btn-primary {
+    background-color: black;
+    border-color: black;
+    color: white;
+}
+
+.btn-primary:hover {
+    background-color: black;
+    border-color: black;
+    color: grey;
+}
+#select {
+    padding: 0.3em;
+}

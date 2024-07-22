@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document Management - Adaptive Competency Development Suite</title>
+  <link href="../../resources/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+  <link href="../../app/documents-management/documents-management.css" rel="stylesheet">
+  <link rel="icon" href="../../resources/Images/competence-logo.gif" type="image/x-icon">
+</head>
+<body>
+  <div class="sidenav" id="mySidenav">
+    <!-- Sidebar content if any -->
+  </div>
+  <div class="main-content">
+    <div class="container mt-5">
+      <h2>Document Management</h2>
+      <br>
+      <form id="documentUploadForm" enctype="multipart/form-data">
+        <div class="row">
+          <div class="col-md-6 mb-4">
+            <div class="card">
+              <div class="card-body">
+                <h5 class="card-title">Select Document Type</h5>
+                <select name="documentType" id="select" class="form-control mb-3" required>
+                  <option value="">Choose a document...</option>
+                  <option value="aadharCard">Aadhar Card</option>
+                  <option value="passportPhoto">Passport Photo</option>
+                  <option value="bankPassbook">Bank Passbook</option>
+                  <option value="salarySlip">Salary Slip</option>
+                </select>
+                <div class="custom-file mb-3">
+                  <input type="file" name="documentFile" class="custom-file-input" id="documentFile" accept="image/*,application/pdf" required>
+                  <label class="custom-file-label" for="documentFile">Choose File</label>
+                </div>
+                <div class="text-center">
+                  <button type="submit" class="btn btn-primary">Upload Document</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </form>
+      <!-- Uploaded Documents Section -->
+      <div id="uploadedDocuments" class="mt-5">
+        <h4>Uploaded Documents</h4>
+        <div id="documentsList" class="row mt-3">
+          <!-- Uploaded documents will be displayed here -->
+        </div>
+      </div>
+    </div>
+  </div>
+  <script src="../../resources/jquery/jquery-3.7.1.min.js"></script>
+  <script src="../../resources/bootstrap/js/bootstrap.bundle.min.js"></script>
+  <script src="../../app/documents-management/documents-management.js"></script>
+</body>
+</html>

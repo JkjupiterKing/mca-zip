@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Customer Orders</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="../../resources/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="customer-orders.css">
+    <link rel="icon" href="../../resources/Images/supply-chain-management.png" type="image/x-icon">
+</head>
+<body>
+    <header>
+        <button class="openbtn btn btn-secondary" onclick="openNav()">&#9776;</button>
+        <button id="logoutBtn" class="btn btn-secondary">
+            Logout <img src="../../resources/Images/logout.png" alt="icon" style="width: 1.1em;margin-bottom: 0.2em;">
+        </button>
+    </header>
+    <div id="mySidenav" class="sidenav">
+    </div>  
+    <br> 
+    <main>
+        <div>
+            <h1 style="margin-left: 1.3em;">Manage Customer Orders</h1>
+            <p style="margin-left: 3.3em; padding: 1em 0 0 0;">Track your orders here.</p>
+        </div>
+        <div class="container" id="display">
+            <div class="btns d-flex align-items-center" role="group" aria-label="Order Filters">
+                <button type="button" class="btn filter-button" data-status="all">All Orders</button>
+                <button type="button" class="btn filter-button" data-status="processing">Processed Orders</button>
+                <button type="button" class="btn filter-button" data-status="shipped">Shipped Orders</button>
+                <button type="button" class="btn filter-button" data-status="pending">Pending Orders</button>
+                <button type="button" class="btn filter-button" data-status="delivered">Delivered Orders</button>
+                <form class="form-inline mt-3 ml-auto" onsubmit="event.preventDefault();">
+                    <input class="form-control mr-2" type="search" placeholder="Search for customer-orders.." aria-label="Search" id="searchInput">
+                </form>
+            </div>
+        </div>        
+        <br>
+        <div class="table-responsive" id="table">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Order ID</th>
+                        <th>Customer Name</th>
+                        <th>Product Name</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody id="ordersTableBody">
+                    <!-- Table rows will be dynamically added here -->
+                </tbody>
+            </table>
+        </div>
+        <br>
+        <!-- Pagination -->
+        <nav aria-label="Page navigation">
+            <ul id="pagination" class="pagination justify-content-center">
+                <li class="page-item disabled" id="previousPage">
+                    <a class="page-link" tabindex="-1" aria-disabled="true">Previous</a>
+                </li>
+                <!-- Pagination links will be dynamically added here -->
+                <li class="page-item active"><a class="page-link" href="#" onclick="showPage(1)">1</a></li>
+                <li class="page-item"><a class="page-link" href="#" onclick="showPage(2)">2</a></li>
+                <li class="page-item"><a class="page-link" href="#" onclick="showPage(3)">3</a></li>
+                <li class="page-item" id="nextPage">
+                    <a class="page-link" onclick="showNextPage()">Next</a>
+                </li>
+            </ul>
+        </nav>
+    </main>
+    <div class="container px-1 px-md-4 py-5 mx-auto" id="orderDetailsContainer">
+        <!-- Content will be generated dynamically -->
+    </div>
+    <script src="../../resources/jquery/jquery-3.7.1.min.js"></script>
+    <script src="../../app/customer-orders/customer-orders.js"></script>
+    <script src="../../resources/bootstrap/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

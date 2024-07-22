@@ -1,0 +1,34 @@
+main {
+    margin-left: 285px;
+    margin-top: 1.5em;
+    margin-right: 1.2em;
+}
+#DisplayUsersList {
+    width: 100%; /* Adjust the width as per your design needs */
+    margin: 0 auto; /* Center align the table */
+  }
+  #searchInput {
+    width: 200px; /* Adjust the width as per your design needs */
+    margin: 0 auto; /* Center align the input */
+  }
+  #submit {
+    background-color: grey;
+    border-color: grey;
+  }
+ 
+#ManageUsersTableData .btn-update {
+  background-color:grey; /* Bootstrap primary color */
+  border-color: grey;
+  color: #fff; /* Text color */
+}
+
+#ManageUsersTableData .btn-delete {
+  background-color: #dc3545; /* Bootstrap danger color */
+  color: #fff; /* Text color */
+}
+#ManageUsersTableData .btn-update:hover {
+  color: black;
+}
+#ManageUsersTableData .btn-delete:hover {
+  color: black;
+}
