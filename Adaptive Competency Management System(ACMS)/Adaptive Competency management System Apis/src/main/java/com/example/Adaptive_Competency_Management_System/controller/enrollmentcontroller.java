@@ -20,10 +20,16 @@ public class enrollmentcontroller {
     }
 
     // Get all enrollments
-    @GetMapping
+    @GetMapping("all")
     public List<enrollment> getAllEnrollments() {
         System.out.println("here");
         return enrollmentRepository.findAll();
+    }
+
+    @GetMapping
+    public List<enrollment> getEnrollmentsByEmployeeId(@RequestParam Long employeeId) {
+        System.out.println("employeeId:"+employeeId);
+        return enrollmentRepository.findByEmployeeId(employeeId);
     }
 
     // Get enrollment by ID
@@ -36,7 +42,7 @@ public class enrollmentcontroller {
     // Create a new enrollment
     @PostMapping("/addenrollment")
     public enrollment createEnrollment(@RequestBody enrollment enrollment) {
-        enrollment.setCompleted(false);
+        // enrollment.setCompleted(false);
         return enrollmentRepository.save(enrollment);
     }
 
@@ -48,7 +54,7 @@ public class enrollmentcontroller {
                     enrollment.setEmployee(updatedEnrollment.getEmployee());
                     enrollment.setCourse(updatedEnrollment.getCourse());
                     enrollment.setEnrollmentDate(updatedEnrollment.getEnrollmentDate());
-                    enrollment.setCompleted(updatedEnrollment.isCompleted());
+                    enrollment.setStatus(updatedEnrollment.getStatus());
                     return enrollmentRepository.save(enrollment);
                 })
                 .orElseThrow(() -> new RuntimeException("Enrollment not found with id " + id));

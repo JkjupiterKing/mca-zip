@@ -7,4 +7,6 @@ VALUES
     ('Software Testing', 'Introduction to software testing principles', 5, '2024-08-15', '2024-11-30', '../../resources/Images/test.png', '../../resources/course videos/software testing.mp4');
 
 INSERT INTO employees (EMPLOYEE_ID, ADDRESS, BIRTH_DATE, DEPARTMENT, EMAIL, FIRST_NAME, HIRE_DATE, LAST_NAME, PASSWORD, POSITION)
-VALUES (1, '123 Main St', '1990-01-01', 'IT', 'a@b.com', 'John', '2020-01-01', 'Doe', 'YQ==', 'Manager');
+VALUES 
+(1, '123 Main St', '1990-01-01', 'IT', 'jhon@jk.com', 'John', '2020-01-01', 'Doe', 'YQ==', 'Manager'),
+(2, '123 Main St', '1990-01-01', 'IT', 'tom@jk.com', 'Tom', '2020-01-01', 'Doe', 'YQ==', 'Employee');

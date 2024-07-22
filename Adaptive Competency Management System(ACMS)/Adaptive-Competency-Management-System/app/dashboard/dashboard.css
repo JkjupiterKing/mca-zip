@@ -45,6 +45,10 @@ h2 {
  font-size: 1.5em;
  font-weight: bold;
 }
+#enrolledCoursesList{
+    font-size: 1.5em;
+    font-weight: bold;
+   }
 #completedCoursesList{
  font-size: 1.5em;
  font-weight: bold;

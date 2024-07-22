@@ -34,7 +34,6 @@ public class enrollment {
     @Column(name = "enrollment_date")
     private Date enrollmentDate;
 
-    @Column(name = "is_completed")
-    private boolean isCompleted = false; // Default value is false
+    private String  status = "Enrolled"; // Default value is Enrolled/Other Sttaus Started/Completed
 
 }

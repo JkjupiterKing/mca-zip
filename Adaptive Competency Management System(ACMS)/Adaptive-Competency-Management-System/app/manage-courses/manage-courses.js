@@ -1,60 +1,107 @@
 $('#mySidenav').load('../common/sidenav.html');
 
-var courses;
-document.addEventListener('DOMContentLoaded', function() {
-
-    // Function to fetch enrolled courses for the current user
-    function fetchEnrolledCourses(employeeId) {
-        const apiUrl = `http://localhost:8080/enrollments?employeeId=${employeeId}`;
-
-        fetch(apiUrl)
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
-                }
-                return response.json();
-            })
-            .then(enrollments => {
-                if (enrollments.length === 0) {
-                    displayNoEnrolledCoursesMessage();
-                } else {
-                    const courseIds = enrollments.map(enrollment => enrollment.course.courseId); // Assuming enrollment structure
-                    fetchCourses(courseIds);
-                }
-            })
-            .catch(error => {
-                console.error('Error fetching enrolled courses:', error);
-                // Display error message or handle accordingly
-            });
+var enrollments;
+var enrolledCourses;
+document.addEventListener('DOMContentLoaded', function () {
+    // Initialize UI with enrolled courses for the current user
+    const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+    if (currentUser && currentUser.employeeId) {
+        fetchEnrolledCourses(currentUser.employeeId);
+    } else {
+        console.error('No current user found or employee ID missing in localStorage.');
+        // Display message or handle redirect to login, etc.
     }
+});
 
-    // Function to fetch course details based on IDs
-    function fetchCourses(courseIds) {
-        const apiUrl = `http://localhost:8080/courses`;
+// Function to mark course as completed
+function updatedProgress(enrollment, status) {
+    console.log('updatedProgress enrollment', enrollment);
+    const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+    const apiUrl = `http://localhost:8080/enrollments/${enrollment.enrollmentId}`;
+    enrollment.status = status;
+    fetch(apiUrl, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(enrollment)
+    })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Failed to mark course as completed');
+            }
+            if (status == 'Completed') (
+                alert('Course marked as complete')
+            )
+            return response.json();
+        })
+        .then(() => {
+            fetchEnrolledCourses(currentUser.employeeId); // Fetch and display updated enrollments
+        })
+        .catch(error => {
+            console.error('Error marking course as completed:', error);
+            alert('Failed to mark course as completed. Please try again.');
+        });
+}
 
-        fetch(apiUrl)
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
-                }
-                return response.json();
-            })
-            .then(courses => {
-                const enrolledCourses = courses.filter(course => courseIds.includes(course.courseId));
-                displayCourses(enrolledCourses);
-            })
-            .catch(error => {
-                console.error('Error fetching courses:', error);
-                // Display error message or handle accordingly
-            });
-    }
+function fetchVideoUrl(courseId) {
+    const apiUrl = `http://localhost:8080/courses/${courseId}`; // Assuming endpoint to fetch video URL
 
-// Function to display courses in the UI as cards
-function displayCourses(courses) {
+    fetch(apiUrl)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
+        .then(video => {
+            // Assuming the API returns a JSON object with video URL
+            if (video && video.courseUrl) {
+                // Example: Open video in a new tab
+                window.open(video.courseUrl, '_blank');
+            } else {
+                console.error('Video URL not found in API response');
+            }
+        })
+        .catch(error => {
+            console.error('Error fetching video URL:', error);
+            // Display error message or handle accordingly
+        });
+}
+
+
+function fetchEnrolledCourses(employeeId) {
+    const apiUrl = `http://localhost:8080/enrollments?employeeId=${employeeId}`;
+
+    fetch(apiUrl)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log('data', data);
+            if (data.length === 0) {
+                displayNoEnrolledCoursesMessage();
+            } else {
+                enrollments = data;
+                displayCourses(enrollments);
+            }
+        })
+        .catch(error => {
+            console.error('Error fetching enrolled courses:', error);
+            // Display error message or handle accordingly
+        });
+}
+
+function displayCourses(enrollments) {
+    console.log('enrolledCourse', enrollments);
     const coursesList = document.getElementById('coursesList');
     coursesList.innerHTML = ''; // Clear previous content
 
-    courses.forEach(course => {
+    enrollments.forEach(enrollment => {
+        const course = enrollment.course;
         // Create card container
         const card = document.createElement('div');
         card.classList.add('card', 'mb-3');
@@ -92,26 +139,40 @@ function displayCourses(courses) {
         startLearningButton.id = `startLearning_${course.courseId}`; // Example ID with courseId
         startLearningButton.classList.add('btn', 'btn-primary');
         startLearningButton.href = '#';
-        startLearningButton.textContent = 'Start Learning';
+        if (enrollment.status == 'Ongoing'|| enrollment.status == 'Completed') {
+            startLearningButton.textContent = 'Continue Learning';
+        }
+        else {
+            startLearningButton.textContent = 'Start Learning';
+        }
+
         // Add event listener to handle "Start Learning" button click
-        startLearningButton.addEventListener('click', function(event) {
+        startLearningButton.addEventListener('click', function (event) {
             event.preventDefault();
-            fetchVideoUrl(course.courseId); 
+            fetchVideoUrl(course.courseId);
             console.log('Clicked "Start Learning" for course:', course);
-            markCompletedButton.disabled = false;
+            if (enrollment.status == 'Enrolled') {
+                updatedProgress(enrollment, 'Ongoing');
+            }
         });
         buttonGroup.appendChild(startLearningButton);
 
         // Create "Mark as Completed" button
         const markCompletedButton = document.createElement('button');
         markCompletedButton.id = `markCompleted_${course.courseId}`; // Example ID with courseId
-        markCompletedButton.classList.add('btn', 'btn-primary', 'ml-2');
-        markCompletedButton.textContent = 'Mark as Completed';
-        markCompletedButton.disabled = true;
+        if (enrollment.status == 'Completed') {
+            markCompletedButton.classList.add('btn', 'ml-2');
+            markCompletedButton.disabled = true;
+            markCompletedButton.textContent = 'Already Marked as Completed';
+        } else {
+            markCompletedButton.classList.add('btn', 'btn-primary', 'ml-2');
+            markCompletedButton.disabled = false;
+            markCompletedButton.textContent = 'Mark as Completed';
+        }
         // Add event listener to handle "Mark as Completed" button click
-        markCompletedButton.addEventListener('click', function(event) {
+        markCompletedButton.addEventListener('click', function (event) {
             event.preventDefault();
-            markCourseCompleted(course.courseId); // Call function to mark course as completed
+            updatedProgress(enrollment, 'Completed');
         });
         buttonGroup.appendChild(markCompletedButton);
 
@@ -124,71 +185,4 @@ function displayCourses(courses) {
         // Append card to courses list
         coursesList.appendChild(card);
     });
-}
-
-    // Initialize UI with enrolled courses for the current user
-    const currentUser = JSON.parse(localStorage.getItem('currentUser'));
-    if (currentUser && currentUser.employeeId) {
-        fetchEnrolledCourses(currentUser.employeeId);
-    } else {
-        console.error('No current user found or employee ID missing in localStorage.');
-        // Display message or handle redirect to login, etc.
-    }
-});
-
-// Function to mark course as completed
-function markCourseCompleted(courseId) {
-    const currentUser = JSON.parse(localStorage.getItem('currentUser'));
-    const apiUrl = `http://localhost:8080/enrollments?employeeId=${currentUser.employeeId}&isCompleted=false`;
-
-    const updateData = {
-        isCompleted: true
-    };
-
-    fetch(apiUrl, {
-        method: 'PUT',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(updateData)
-    })
-    .then(response => {
-        if (!response.ok) {
-            throw new Error('Failed to mark course as completed');
-        }
-        alert('Course marked as completed');
-        return response.json();
-    })
-    .then(() => {
-        fetchEnrolledCourses(currentUser.employeeId); // Fetch and display updated enrollments
-    })
-    .catch(error => {
-        console.error('Error marking course as completed:', error);
-        alert('Failed to mark course as completed. Please try again.');
-    });
-}
-
-function fetchVideoUrl(courseId) {
-    const apiUrl = `http://localhost:8080/courses/${courseId}`; // Assuming endpoint to fetch video URL
-
-    fetch(apiUrl)
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('Network response was not ok');
-            }
-            return response.json();
-        })
-        .then(video => {
-            // Assuming the API returns a JSON object with video URL
-            if (video && video.courseUrl) {
-                // Example: Open video in a new tab
-                window.open(video.courseUrl, '_blank');
-            } else {
-                console.error('Video URL not found in API response');
-            }
-        })
-        .catch(error => {
-            console.error('Error fetching video URL:', error);
-            // Display error message or handle accordingly
-        });
 }
