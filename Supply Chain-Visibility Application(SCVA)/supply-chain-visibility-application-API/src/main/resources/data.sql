@@ -9,7 +9,8 @@ INSERT INTO customerorders (order_id, customer_name, product_name, status) VALUE
     (7, 'Dwayne Johnson', 'Camera', 'Processing'),
     (8, 'Rayn Reynolds', 'Fitness Tracker', 'Delivered'),
     (9, 'Pearson', 'External Hard Drive', 'Pending'),
-    (10, 'Will Smith', 'Gaming Console', 'Shipped');
+    (10, 'Will Smith', 'Gaming Console', 'Shipped'),
+    (11, 'jaden Smith', 'Gaming mouse', 'Pending');
 
 INSERT INTO purchaseorders (item, quantity, supplier, price) VALUES
     ('Laptop', 2, 'ABC Suppliers', 20000),
