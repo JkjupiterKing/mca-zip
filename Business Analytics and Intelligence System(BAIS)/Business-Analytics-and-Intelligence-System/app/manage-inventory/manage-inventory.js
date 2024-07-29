@@ -1,1 +1,0 @@
-$('#mySidenav').load('../../app/sidebar/sidebar.html');

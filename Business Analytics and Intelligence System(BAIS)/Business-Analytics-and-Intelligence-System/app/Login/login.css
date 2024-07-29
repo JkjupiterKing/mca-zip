@@ -54,3 +54,8 @@ h1{
     margin-left: 3em;
     font-family: "Mukta", sans-serif;
 }
+.forgot-password-link {
+    text-decoration: none;
+    color: black;
+    margin-left: 0.3em;
+}

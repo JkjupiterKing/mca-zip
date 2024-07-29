@@ -26,6 +26,9 @@
               <div class="btn-group me-2" role="group" aria-label="Add New Project">
                   <button type="button" class="btn btn-secondary" id="add-btn">Add Project</button>
               </div>
+              <div class="btn-group me-2" role="group" aria-label="Add New Project">
+                  <button type="button" class="btn btn-secondary" id="download-btn">Download</button>  
+            </div>
           </div>
       </div>
     </div>
@@ -35,11 +38,11 @@
     </div>
     <br>
     <!-- Table for managing existing projects -->
-    <table id="DisplayProjectsList" class="table table-striped visible">
+    <table id="DisplayProjectsList" class="table table-striped visible" style="width: 100%;margin: 0 auto;">
         <thead class="thead-dark">
             <tr>
                 <th>Project Name</th>
-                <th>Project Description</th>
+                <th id="projectDescription">Project Description</th>
                 <th>Status</th>
                 <th>Actions</th>
             </tr>
@@ -48,6 +51,10 @@
             <!-- Project data will be dynamically inserted here -->
         </tbody>
     </table>
+    <br>
+    <ul id="pagination" class="pagination">
+        <!-- Pagination links will be dynamically added here -->
+    </ul>
     <br>
     <!-- Form for adding new project -->
     <div id="AddProjectForm" class="hidden" style="width: 100%;">
@@ -67,13 +74,13 @@
             <div class="form-group">
                 <label for="status">Status</label>
                 <select class="form-control" id="status" name="status" required>
-                    <option value="planned">Planned</option>
-                    <option value="ongoing">Ongoing</option>
-                    <option value="completed">Upcoming</option>
-                    <option value="not-started">Not Started</option>
-                    <option value="completed">Completed</option>
-                    <option value="in-progress">In Progress</option>
-                    <option value="pending">Pending</option>
+                    <option value="Planned">Planned</option>
+                    <option value="Ongoing">Ongoing</option>
+                    <option value="Upcoming">Upcoming</option>
+                    <option value="Not Started">Not Started</option>
+                    <option value="Completed">Completed</option>
+                    <option value="In-Progress">In-Progress</option>
+                    <option value="Pending">Pending</option>
                 </select>
             </div>
             <br>
@@ -108,13 +115,13 @@
                         <div class="form-group">
                             <label for="updateStatus">Status</label>
                             <select class="form-control" id="updateStatus" name="updateStatus" required>
-                                <option value="planned">Planned</option>
-                                <option value="ongoing">Ongoing</option>
-                                <option value="completed">Upcoming</option>
-                                <option value="not-started">Not Started</option>
-                                <option value="completed">Completed</option>
-                                <option value="in-progress">In Progress</option>
-                                <option value="pending">Pending</option>
+                                <option value="Planned">Planned</option>
+                                <option value="Ongoing">Ongoing</option>
+                                <option value="Upcoming">Upcoming</option>
+                                <option value="Not Started">Not Started</option>
+                                <option value="Completed">Completed</option>
+                                <option value="In-Progress">In-Progress</option>
+                                <option value="Pending">Pending</option>
                             </select>
                         </div>
                         <br>
@@ -128,5 +135,6 @@
   <script src="../../resources/jquery/jquery-3.7.1.min.js"></script>
   <script src="../../resources/bootstrap/js/bootstrap.bundle.min.js"></script>
   <script src="../../app/project-management/project-management.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.17.5/dist/xlsx.full.min.js"></script>
 </body>
 </html>

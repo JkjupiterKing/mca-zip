@@ -1,13 +1,19 @@
 $('#mySidenav').load('../../app/sidebar/sidebar.html');
 
+let projects = [];
+
 document.addEventListener('DOMContentLoaded', function() {
-    // Function to fetch projects from API and display in the table
+    // Constants for pagination
+    const pageSize = 10; // Number of projects per page
+    let currentPage = 1; // Initialize current page
+    let totalPages = 0; // Variable to hold total pages
+
     function fetchProjects() {
         var xhr = new XMLHttpRequest();
         xhr.open('GET', 'http://localhost:8080/projects/all');
         xhr.onload = function() {
             if (xhr.status === 200) {
-                var projects = JSON.parse(xhr.responseText);
+                projects = JSON.parse(xhr.responseText); // Store projects in global variable
                 displayProjects(projects);
             } else {
                 console.error('Error fetching projects:', xhr.statusText);
@@ -20,12 +26,18 @@ document.addEventListener('DOMContentLoaded', function() {
         xhr.send();
     }
 
-    // Function to display projects in the table
+    // Function to display projects in the table for a specific page
     function displayProjects(projects) {
         var tableBody = document.getElementById('ManageProjectsTableData');
         tableBody.innerHTML = '';
 
-        projects.forEach(function(project) {
+        // Calculate pagination variables
+        totalPages = Math.ceil(projects.length / pageSize);
+        var startIndex = (currentPage - 1) * pageSize;
+        var endIndex = startIndex + pageSize;
+        var pageProjects = projects.slice(startIndex, endIndex);
+
+        pageProjects.forEach(function(project) {
             var projectId = project.id;
 
             var row = '<tr data-project-id="' + projectId + '">' +
@@ -39,8 +51,29 @@ document.addEventListener('DOMContentLoaded', function() {
                 '</tr>';
             tableBody.insertAdjacentHTML('beforeend', row);
         });
+
+        updatePagination(); // Update pagination links
     }
 
+    // Function to update pagination links
+    function updatePagination() {
+        var pagination = document.getElementById('pagination');
+        var paginationHtml = '';
+
+        // Generate pagination HTML dynamically
+        for (var i = 1; i <= totalPages; i++) {
+            paginationHtml += '<li class="page-item ' + (currentPage === i ? 'active' : '') + '"><a class="page-link" href="#" onclick="gotoPage(' + i + ')">' + i + '</a></li>';
+        }
+
+        // Update the pagination container with the generated HTML
+        pagination.innerHTML = paginationHtml;
+    }
+
+    // Function to navigate to a specific page
+    window.gotoPage = function(pageNumber) {
+        currentPage = pageNumber; // Update current page
+        fetchProjects(); // Fetch and display projects for the selected page
+    }; 
 
 // Function to handle adding a new project
 function addProject() {
@@ -194,7 +227,6 @@ function updateProject(projectData) {
     xhr.send(JSON.stringify(projectData));
 }
 
-
     // Event listener for update form submission
     var updateProjectForm = document.getElementById('UpdateProjectForm');
     if (updateProjectForm) {
@@ -236,6 +268,7 @@ function deleteProject(projectId) {
             console.log('Project deleted successfully.');
             alert("Project deleted successfully");
             removeProjectRow(projectId); // Remove the project row from UI
+            window.location.reload();
             fetchProjects();
         } else {
             console.error('Error deleting project:', xhr.statusText);
@@ -249,7 +282,6 @@ function deleteProject(projectId) {
     xhr.send();
 }
 
-
     // Function to remove project row from table
     function removeProjectRow(projectId) {
         var rowToRemove = document.querySelector('tr[data-project-id="' + projectId + '"]');
@@ -262,14 +294,13 @@ function deleteProject(projectId) {
 
     // Function to display add project form and hide other elements
     function displayAddProjectForm() {
-        // Show add project form
         document.getElementById('AddProjectForm').style.display = 'block';
-        
-        // Hide manage projects table and associated elements
         document.getElementById('DisplayProjectsList').style.display = 'none';
         document.getElementById('searchBar').style.display = 'none';
         document.getElementById('ProjectManagementTitle').style.display = 'none';
-        
+        document.getElementById('manage-btn').style.display = 'block';
+        document.getElementById('pagination').style.display = 'none';
+        document.getElementById('download-btn').style.display = 'none';
         // Hide add project button
         var addBtn = document.getElementById('add-btn');
         if (addBtn) {
@@ -279,41 +310,63 @@ function deleteProject(projectId) {
 
     // Function to display manage projects table and hide add project form
     function displayManageProjects() {
-        // Hide add project form
         document.getElementById('AddProjectForm').style.display = 'none';
-        
-        // Show manage projects table and associated elements
         document.getElementById('DisplayProjectsList').style.display = 'table';
         document.getElementById('searchBar').style.display = 'block';
         document.getElementById('ProjectManagementTitle').style.display = 'block';
-        
-        // Show add project button
+        document.getElementById('manage-btn').style.display = 'none';
         var addBtn = document.getElementById('add-btn');
         if (addBtn) {
             addBtn.style.display = 'block';
         }
+        window.location.reload();
     }
 
-    // Event listener for search input change
-    var searchInput = document.getElementById('searchInput');
-    if (searchInput) {
-        searchInput.addEventListener('input', function() {
-            var searchTerm = searchInput.value.toLowerCase();
-            var rows = document.querySelectorAll('#ManageProjectsTableData tr[data-project-id]');
-
-            rows.forEach(function(row) {
-                var title = row.querySelector('td:nth-child(1)').textContent.toLowerCase();
-                if (title.includes(searchTerm)) {
-                    row.style.display = '';
-                } else {
-                    row.style.display = 'none';
-                }
-            });
+    function performSearch() {
+        const searchTerm = document.getElementById('searchInput').value.trim().toLowerCase();
+    
+        // Filter projects based on search term
+        const filteredProjects = projects.filter(project => {
+            const title = project.title.toLowerCase();
+            const description = project.description.toLowerCase();
+            const status = project.status.toLowerCase();
+    
+            return title.includes(searchTerm) || 
+                   description.includes(searchTerm) || 
+                   status.includes(searchTerm);
         });
+    
+        // Calculate total pages based on filtered results
+        totalPages = Math.ceil(filteredProjects.length / pageSize);
+        currentPage = 1; // Reset to the first page
+    
+        // Display filtered projects for the current page
+        displayProjects(filteredProjects);
+        updatePagination();
     }
+
+    document.getElementById('download-btn').addEventListener('click', function() {
+        const table = document.getElementById('DisplayProjectsList');
+        const clone = table.cloneNode(true); // Clone the table
+        const headers = clone.querySelectorAll('thead th');
+        const rows = clone.querySelectorAll('tbody tr');
+
+        // Remove the last column header
+        headers[headers.length - 1].remove();
+
+        // Remove the last column in each row
+        rows.forEach(row => {
+            row.querySelector('td:last-child').remove();
+        });
+
+        const wb = XLSX.utils.table_to_book(clone, { sheet: "Projects Details" });
+        XLSX.writeFile(wb, 'Projects Details.xlsx');
+    });
 
     // Initialize by fetching and displaying projects
     fetchProjects();
+    document.getElementById('manage-btn').style.display = 'none';
+    document.getElementById('searchInput').addEventListener('input', performSearch);
 });
 
 

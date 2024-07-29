@@ -1,22 +1,106 @@
 
 document.addEventListener('DOMContentLoaded', function() {
-    // Your JavaScript code here
+    // Handle login form submission
     document.getElementById('login-form').addEventListener('submit', function(event) {
         event.preventDefault();
-        // Rest of your login form handling code
-        var username = document.getElementById('username').value;
+        var email = document.getElementById('email').value;
         var password = document.getElementById('password').value;
 
-        // Here you can perform validation of username and password if needed
-        // For simplicity, assuming validation is successful, redirect to dashboard page
-        if (username.trim() !== '' && password.trim() !== '') {
-            // Redirect to dashboard page (replace 'dashboard.html' with your actual dashboard page URL)
-            window.location.href = '../../app/dashboard/dashboard.html';
+        if (email.trim() !== '' && password.trim() !== '') {
+            // Fetch all users
+            var userFetchUrl = 'http://localhost:8080/users/all';
+
+            fetch(userFetchUrl, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Failed to fetch users.');
+                }
+                return response.json();
+            })
+            .then(users => {
+                // Find the user based on email and password
+                let userFound = users.find(user => user.email === email && user.password === password); // Simple comparison (password should be hashed)
+                
+                if (userFound) {
+                    // Store user information in localStorage with roleId
+                    const userToStore = {
+                        email: userFound.email,
+                        roleId: userFound.role.roleId // Ensure roleId is included
+                    };
+                    localStorage.setItem('user', JSON.stringify(userToStore));
+                    
+                    // Log the stored user information
+                    console.log('User stored in localStorage:', userToStore);
+
+                    // Redirect based on roleId
+                    if (userFound.role.roleId === 5) {
+                        window.location.href = '../../app/Announcements-Management/Announcements-Management.html'; 
+                    } else {
+                        window.location.href = '../../app/dashboard/dashboard.html';      
+                    }
+
+                } else {
+                    alert('Invalid email or password. Please check your credentials.');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Login failed. Please try again.');
+            });
         } else {
-            alert('Please enter username and password.');
+            alert('Please enter email and password.');
         }
     });
+    const forgotPasswordLink = document.querySelector('.forgot-password-link');
+    const modal = new bootstrap.Modal(document.getElementById('forgotPasswordModal'));
+    forgotPasswordLink.addEventListener('click', function(event) {
+        event.preventDefault();
+        modal.show();
+    });
 });
+
+// JavaScript code to handle forgot password form submission
+document.getElementById('forgotPasswordForm').addEventListener('submit', function(event) {
+    event.preventDefault(); // Prevent the form from submitting normally
+
+    // Get the email entered by the user
+    var email = document.getElementById('forgotEmail').value;
+    var newPassword = document.getElementById('newPassword').value;
+
+    // Send a request to your backend API to handle password reset
+    var resetPasswordUrl = 'http://localhost:8080/users/reset-password'; // Replace with your actual API endpoint
+    console.log("calling API");
+    fetch(resetPasswordUrl, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ email: email, password:newPassword })
+    })
+    .then(response => {
+        console.log('response',response);
+        if (response.status==404) {
+            alert('Email ID not found in the system, please enter valid email id.');
+            // $('#forgotPasswordModal').modal('hide'); // Hide the modal after success
+        } else if (response.ok) {
+            alert('Password has been reset. Please login using the new password.');
+            $('#forgotPasswordModal').modal('hide'); // Hide the modal after success
+        } else {
+            $('#forgotPasswordModal').modal('hide'); // Hide the modal after success
+            throw new Error('Failed to reset password. Please try again.');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Failed to reset password. Please try again.');
+    });
+});
+
 
 
        

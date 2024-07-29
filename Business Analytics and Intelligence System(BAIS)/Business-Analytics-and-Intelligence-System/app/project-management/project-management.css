@@ -1,6 +1,6 @@
 
 main {
-    margin-left: 285px;
+    margin-left: 295px;
     margin-top: 1.5em;
     margin-right: 1.2em;
 }
@@ -10,10 +10,6 @@ main {
 .visible {
   display: block;
 }
-#DisplayProjectsList {
-    width: 100%; /* Adjust the width as per your design needs */
-    margin: 0 auto; /* Center align the table */
-  }
   #searchInput {
     width: 200px; /* Adjust the width as per your design needs */
   }
@@ -28,6 +24,13 @@ main {
   #submitProject:hover {
     color: black;
   }
+  #projectDescription {
+    margin-left: 1em;
+  }
+  #DisplayProjectsList th {
+    width: 27%; 
+  }
+
 #ManageProjectsTableData .btn-update {
   background-color:grey; /* Bootstrap primary color */
   border-color: grey;
@@ -43,4 +46,34 @@ main {
 }
 #ManageProjectsTableData .btn-delete:hover {
   color: black;
+}
+.pagination {
+  justify-content: center; /* Centers the pagination items */
+  font-weight: bold; /* Makes the font bold */
+  margin-right: 5em;
+}
+
+.pagination li {
+  display: inline-block; /* Displays pagination items horizontally */
+  font-size: 1.2em; /* Adjusts the font size */
+}
+.pagination a {
+  color: black; /* Sets the text color */
+  text-decoration: none; /* Removes underline */
+  padding: 8px 12px; /* Adds padding inside the pagination items */
+  border: 1px solid #071952; /* Adds a border around pagination items */
+  border-radius: 1px; /* Rounds the corners */
+}
+
+.pagination a:hover {
+  background-color: grey; /* Changes background color on hover */
+  color: white; /* Changes text color on hover */
+}
+.pagination .active a {
+  background-color: grey; /* Changes background color for active item */
+  border-color: grey;
+  color: white; /* Changes text color for active item */
+}
+#download-btn {
+  left: 780%;
 }
