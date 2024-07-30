@@ -2,13 +2,31 @@ $('#mySidenav').load('../common/sidenav.html');
 
 document.addEventListener("DOMContentLoaded", function() {
     fetchStocks(); // Initial fetch of stocks when the page loads
+    document.getElementById('manage-btn').style.display = 'none';
 });
 
-function displayStocks(stocks) {
-    var tableBody = document.getElementById('stockTableBody');
-    tableBody.innerHTML = '';
+let stocks = []; // Array to hold stock data
+const pageSize = 10; // Number of stocks per page
+let currentPage = 1; // Initialize current page
+let totalPages = 0; // Variable to hold total pages
 
-    stocks.forEach(function(stock) {
+// Function to calculate total pages based on data length and page size
+function calculateTotalPages() {
+    totalPages = Math.ceil(stocks.length / pageSize);
+}
+
+// Modify the renderTableRows function to accept filtered stocks
+function renderTableRows(pageNumber, stockList = stocks) {
+    const tableBody = document.getElementById('stockTableBody');
+    tableBody.innerHTML = ''; // Clear existing rows
+
+    // Calculate start and end index for current page
+    const startIndex = (pageNumber - 1) * pageSize;
+    const endIndex = Math.min(startIndex + pageSize, stockList.length);
+    const pageStocks = stockList.slice(startIndex, endIndex);
+
+    // Render rows for the current page
+    pageStocks.forEach(stock => {
         var formattedPrice = stock.price !== null && stock.price !== undefined ? parseFloat(stock.price).toFixed(2) : '-';
         
         var row = '<tr data-stock-id="' + stock.stockId + '">' +
@@ -23,8 +41,9 @@ function displayStocks(stocks) {
                   '</tr>';
         tableBody.insertAdjacentHTML('beforeend', row);
     });
-}
 
+    updatePagination(); // Update pagination links after displaying stocks
+}
 // Function to fetch stocks from API
 function fetchStocks() {
     var xhr = new XMLHttpRequest();
@@ -32,8 +51,9 @@ function fetchStocks() {
     xhr.onload = function() {
         if (xhr.status === 200) {
             try {
-                var stocks = JSON.parse(xhr.responseText);
-                displayStocks(stocks);
+                stocks = JSON.parse(xhr.responseText);
+                calculateTotalPages(); // Calculate total pages based on fetched data
+                gotoPage(1); // Display first page of stocks
             } catch (error) {
                 console.error('Error parsing JSON:', error);
             }
@@ -46,20 +66,44 @@ function fetchStocks() {
     };
     xhr.send();
 }
-// Filtering function
-function filterStocks() {
-    var input = document.getElementById('searchInput');
-    var filter = input.value.toLowerCase();
-    var rows = document.querySelectorAll('#stockTableBody tr');
+// Function to display pagination links
+function updatePagination() {
+    const pagination = document.getElementById('pagination');
+    let paginationHtml = '';
 
-    rows.forEach(function(row) {
-        var stockName = row.querySelector('td:nth-child(1)').textContent.toLowerCase();
-        if (stockName.includes(filter)) {
-            row.style.display = '';
-        } else {
-            row.style.display = 'none';
-        }
+    // Generate pagination HTML dynamically
+    for (let i = 1; i <= totalPages; i++) {
+        paginationHtml += `<li class="page-item ${currentPage === i ? 'active' : ''}"><a class="page-link" href="#" onclick="gotoPage(${i})">${i}</a></li>`;
+    }
+
+    // Update the pagination container with the generated HTML
+    pagination.innerHTML = paginationHtml;
+}
+
+// Function to navigate to a specific page
+window.gotoPage = function(pageNumber) {
+    currentPage = pageNumber; // Update current page
+    renderTableRows(pageNumber); // Render table rows for the selected page
+}
+
+// Function to filter stocks based on search text
+function filterStocks() {
+    const searchText = document.getElementById('searchInput').value.toLowerCase();
+
+    // Filter stocks based on stockId, stockName, and description
+    const filteredStocks = stocks.filter(stock => {
+        const idMatch = stock.stockId.toString().includes(searchText); // Convert id to string for comparison
+        const nameMatch = stock.stockName.toLowerCase().includes(searchText);
+        const descriptionMatch = stock.description ? stock.description.toLowerCase().includes(searchText) : false;
+
+        // Return true if any of the fields match
+        return idMatch || nameMatch || descriptionMatch;
     });
+
+    // Update total pages and display the first page of filtered stocks
+    totalPages = Math.ceil(filteredStocks.length / pageSize);
+    currentPage = 1; // Reset to first page of filtered results
+    renderTableRows(currentPage, filteredStocks); // Pass filtered stocks to render function
 }
 
 // Event listener for search input
@@ -209,6 +253,7 @@ function deleteStock(stockId) {
 
                 // Alert message for successful deletion
                 alert('Stock deleted successfully.');
+                window.location.reload();
             } else {
                 console.error('Error deleting stock:', response.statusText);
                 alert('Failed to delete stock. Please try again.');
@@ -227,10 +272,13 @@ function deleteStock(stockId) {
 function showManageStock() {
     document.getElementById('manageStockTable').style.display = 'block';
     document.getElementById('addStockForm').style.display = 'none';
-    document.getElementById('manage-btn').style.display = 'block';
+    document.getElementById('manage-btn').style.display = 'none';
     document.getElementById('searchInput').style.display = 'block';
     document.getElementById('title').style.display = 'block';
     document.getElementById('add-btn').style.display = 'block';
+    document.getElementById('pagination').style.display = 'inline';
+    document.getElementById('pagination').style.justifyContent = 'center';
+    window.location.reload();
 }
 
 function showAddStockForm() {
@@ -240,6 +288,7 @@ function showAddStockForm() {
     document.getElementById('searchInput').style.display = 'none';
     document.getElementById('title').style.display = 'none';
     document.getElementById('add-btn').style.display = 'none';
+    document.getElementById('pagination').style.display = 'none';
 }
 function openNav() {
     document.getElementById("mySidenav").style.width = "16em";

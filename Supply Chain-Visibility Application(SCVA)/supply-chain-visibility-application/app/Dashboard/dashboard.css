@@ -157,3 +157,13 @@ section {
     background-color: black;
     color: white;
 }
+#refreshData {
+  border-radius: 6px;
+}
+#inventoryLevels {
+  font-size: 1.2em;
+}
+#inventoryCount {
+  margin-bottom: 1em;
+  font-size: 1em;
+}
